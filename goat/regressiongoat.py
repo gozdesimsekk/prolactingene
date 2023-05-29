@@ -1,18 +1,19 @@
 import pandas as pd
-
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
-
 from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 import numpy as np
 
-data = pd.read_excel("alldata_sheep.xlsx")
-data = data.drop(['Sample', 'Breed', 'Animal', '219'], axis=1)
-genotype_columns = ['47845667', '47846990', '47847030', '47847087', '47847605',
-       '47848937', '47848947', '47848956', '47848967', '47849004', '47849959',
-       '47850077', '47850195', '47850213', '47850553']
+data = pd.read_excel("alldata_goat.xlsx")
+data = data.drop(['Sample', 'Breed', 'Animal', '88765', ], axis=1)
+genotype_columns = ['47730493', '47730551', '47730568', '47730655',
+       '47730965', '47730979', '47730994', '47731027', '47731028', '47731085',
+       '47731900', '47731901', '47731906', '47735799', '47735811', '47735829',
+       '47735853', '47735886', '47736181', '47736194', '47736244', '47736256',
+       '47736341']
+
 data = data.rename(columns={'LSV (kg)': 'lsv'})
 
 
@@ -31,26 +32,12 @@ duplicates = data[data.duplicated()]
 # İlk eşleşen satırı silme
 data.drop_duplicates(inplace=True)
 
-#data.to_csv('labelled2.tsv', sep='\t', index=False)
-
-""" VERİ DAĞILIMINI DAHA DÜZENLİ HALE GETİRMEYE ÇALIŞTIM"""
-
-rows_to_drop = data[data['lsv'] == 4.605].index[:16]
-data = data.drop(rows_to_drop)
+#data.to_csv('labelledgoat.tsv', sep='\t', index=False)
 
 #hepsinden kaç tane olduğunu eşitliği kontrol etmek için baktık
 lsv_counts = data['lsv'].value_counts()
-print(lsv_counts)
+#print(lsv_counts)
 
-"""balanced_data = pd.DataFrame()
-
-for group, count in lsv_counts.items():
-    if count >= 4:
-        selected_samples = data[data['lsv'] == group].head(4)
-        balanced_data = balanced_data.append(selected_samples)
-
-print(balanced_data)
-data= balanced_data"""
 
 X = data[genotype_columns]
 y = data["lsv"]
@@ -60,8 +47,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # create a neural network model
 model = Sequential()
-model.add(Dense(15, input_dim=15, activation='relu'))
-model.add(Dense(10, activation='relu'))
+model.add(Dense(23, input_dim=23, activation='relu'))
+model.add(Dense(15, activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(1, activation='linear'))
 
@@ -98,3 +85,7 @@ r2 = r2_score(y_test, y_pred)
 print(f'Mean squared error: {mse}')
 print(f'MAE: {mae}')
 print(f'R^2: {r2}')
+
+"""Mean squared error: 0.20677538891603078
+MAE: 0.3646578523545038
+R^2: 0.14475988884414104"""
